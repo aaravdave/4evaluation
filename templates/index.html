@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>To-do List</title>
+        <link href="/static/styles/style.css" rel="stylesheet"/>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <a>To-do</a>
+                <a href="logout">Logout</a>
+            </div>
+        </nav>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p>{{message}}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="post">
+            <input name="text" type="text"/>
+            <input name="add" type="submit" value="Add"/>
+        </form>
+
+        {% if tasks %}
+            <h1>To-do</h1>
+            {% for task in tasks %}
+                {% if 'complete' not in task or task['complete'] == False %}
+                    <form method="post" id="{{task['text']}}">
+                        {{task['text']}}
+                        <input name="task" value="{{task['text']}}" hidden/>
+                        <input name="delete" type="submit" value="Delete"/>
+                        <input name="edit" type="button" value="Edit" onclick="modify('{{task['text']}}')"/>
+                    </form>
+                    <form method="post">
+                        <input name="task" value="{{task['text']}}" hidden/>
+                        <input name="complete" type="submit" value="Switch Task Status"/>
+                    </form>
+                {% endif %}
+            {% endfor %}
+            <h1>Completed</h1>
+            {% for task in tasks %}
+                {% if task['complete'] == True %}
+                    <form method="post" id="{{task['text']}}">
+                        {{task['text']}}
+                        <input name="task" value="{{task['text']}}" hidden/>
+                        <input name="delete" type="submit" value="Delete"/>
+                        <input name="edit" type="button" value="Edit" onclick="modify('{{task['text']}}')"/>
+                    </form>
+                    <form method="post">
+                        <input name="task" value="{{task['text']}}" hidden/>
+                        <input name="complete" type="submit" value="Switch Task Status"/>
+                    </form>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <script>
+        function modify(name) {
+            let task = document.getElementById(name);
+            task.innerHTML = '<form method="post" id="' + name + '"><input name="new" value="' + name + '"/><input name="old" value="' + name + '" hidden/><input name="okay" type="submit" value="Okay"/><input name="cancel" type="button" value="Cancel" onclick="abort(\'' + name + '\')"/></form>';
+        }
+
+        function abort(name) {
+            let task = document.getElementById(name);
+            task.innerHTML = '<form method="post" id="' + name + '">' + name + '<input name="task" value="' + name + '" hidden/><input name="delete" type="submit" value="Delete"/><input name="edit" type="button" value="Edit" onclick="modify(\'' + name + '\')"/>'
+        }
+        </script>
+    </body>
+</html>
